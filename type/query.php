@@ -3,6 +3,7 @@ require_once __DIR__."/../dao/RecipeDao.php";
 require_once __DIR__."/../dao/IngredientDao.php";
 require_once __DIR__."/../dao/ReviewDao.php";
 require_once __DIR__."/recipeType.php";
+require_once __DIR__."/recipeConnectionType.php";
 require_once __DIR__."/ingredientType.php";
 require_once __DIR__."/reviewType.php";
 require_once __DIR__."/userType.php";
@@ -31,9 +32,13 @@ $queryType = new ObjectType([
             }
         ],
         "recipes"=>[
-            "type"=>Type::listOf($recipeType),
-            "resolve"=>function(){
-                return RecipeDao::getInstance()->getRecipes();
+            "type"=>$recipeConnectionType,
+            "args"=>[
+                "first"=>Type::int(),
+                "after"=>Type::id()
+            ],
+            "resolve"=>function($rootValue, $args){
+                return RecipeDao::getInstance()->getRecipesByPage($args["first"],$args["after"]);
             }
         ],
         "ingredient"=>[

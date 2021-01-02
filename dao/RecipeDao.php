@@ -41,6 +41,25 @@
             return $res;
         }
 
+        public function getRecipesByPage($count, $cursor){
+            $startCursor = $cursor;
+            $conn = $this->connectionManager->getConnection();
+            $sql = "SELECT * FROM Recipe LIMIT $cursor, $count;";
+            $result = $conn->query($sql);
+            $res = array();
+            while($row = $result->fetch_assoc()){
+                array_push($res, ["node"=>$row, "cursor"=>$cursor]);
+                $cursor++;
+            }
+            $pageInfo = [
+                "hasNextPage"=>true,
+                "hasPreviousPage"=>($cursor>$count),
+                "startCursor"=>$startCursor,
+                "endCursor"=>$cursor
+            ];
+            return ["pageInfo"=>$pageInfo, "edges"=>$res];
+        }
+
         public function insertRecipe($recipe){
             $recipeName = $recipe["RecipeName"];
             $imageUrl = $recipe["ImageUrl"];
