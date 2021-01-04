@@ -6,7 +6,12 @@ use GraphQL\Type\Definition\Type;
 $ingredientType = new ObjectType([
     "name"=>"Ingredient",
     "fields"=>[
-        "IngredientId"=>Type::nonNull(Type::id()),
+        "id"=>[
+            "type"=>Type::nonNull(Type::id()),
+            "resolve"=>function($rootValue, $args){
+                return $rootValue["IngredientId"];
+            }
+        ],
         "Name"=>Type::string(),
         "AllergyType"=>[
             "type"=>Type::string(),

@@ -33,4 +33,27 @@
             }
             return $res;
         }
+
+        public function getIngredientIdsByRecipeIdAndPage($recipeId, $count, $cursor){
+            $startCursor = $cursor;
+            $conn = $this->connectionManager->getConnection();
+            $sql = "SELECT IngredientId FROM RecipeIngredient WHERE RecipeID='$recipeId' LIMIT $cursor, $count;";
+            $result=$conn->query($sql);
+            $res = array();
+
+            // IngredientId
+            while($row=$result->fetch_assoc()){
+                array_push($res, ["node"=>$row, "cursor"=>$cursor]);
+                $cursor++;
+            }
+
+            $pageInfo = [
+                "hasNextPage"=>true,
+                "hasPreviousPage"=>($cursor>$count),
+                "startCursor"=>$startCursor,
+                "endCursor"=>$cursor
+            ];
+
+            return ["pageInfo"=>$pageInfo, "edges"=>$res];
+        }
     }
