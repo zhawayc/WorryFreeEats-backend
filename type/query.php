@@ -31,6 +31,21 @@ $queryType = new ObjectType([
                 return RecipeDao::getInstance()->getRecipeById($args["id"]);
             }
         ],
+        "topRecipes"=>[
+            "type"=>Type::listOf($recipeType),
+            "resolve"=>function($root,$args){
+                return RecipeDao::getInstance()->getTop10Recipes();
+            }
+        ],
+        "topRecipesWithoutAllergy"=>[
+            "type"=>Type::listOf($recipeType),
+            "args"=>[
+                "allergy"=>Type::string()
+            ],
+            "resolve"=>function($root,$args){
+                return RecipeDao::getInstance()->getTop10RecipesWithoutAllergy($args["allergy"]);
+            }
+        ],
         "recipes"=>[
             "type"=>$recipeConnectionType,
             "args"=>[

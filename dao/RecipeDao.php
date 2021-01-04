@@ -60,6 +60,51 @@
             return ["pageInfo"=>$pageInfo, "edges"=>$res];
         }
 
+        public function getTop10Recipes(){
+            $conn = $this->connectionManager->getConnection();
+            $sql = "SELECT * FROM Recipe INNER JOIN (
+                SELECT RecipeID, AVG(Rating) AS AVG_Rating FROM Review
+                GROUP BY RecipeID
+                ORDER BY AVG_Rating DESC
+                LIMIT 10
+                ) AS T ON Recipe.RecipeID = T.RecipeID;";
+            $result = $conn->query($sql);
+            $res = array();
+            while($row = $result->fetch_assoc()){
+                array_push($res, $row);
+            }
+            return $res;
+        }
+
+        public function getTop10RecipesWithoutAllergy($allergy){
+            $conn =$this->connectionManager->getConnection();
+            $sql = "SELECT RecipeID, RecipeName, ImageUrl FROM Recipe INNER JOIN(
+                SELECT Review.RecipeID AS Id FROM
+                (SELECT RECIPE_WHOLE_SET.RecipeID AS RECIPE_ID_WITHOUT_MILK_ALLERGY FROM
+                (SELECT RecipeID FROM Recipe) AS RECIPE_WHOLE_SET
+                LEFT OUTER JOIN
+                (SELECT RecipeIngredient.RecipeID AS Id FROM RecipeIngredient
+                INNER JOIN Ingredient 
+                ON RecipeIngredient.IngredientId=Ingredient.IngredientId
+                INNER JOIN AllergyType ON Ingredient.AllergyTypeId=AllergyType.AllergyTypeId
+                WHERE AllergyType.Allergy='$allergy'
+                GROUP BY RecipeIngredient.RecipeID) AS RECIPE_WITH_MILK_ALLERGY
+                ON RECIPE_WHOLE_SET.RecipeID = RECIPE_WITH_MILK_ALLERGY.ID
+                WHERE RECIPE_WITH_MILK_ALLERGY.ID IS NULL) AS RECIPE_WITHOUT_MILK_ALLERGY
+                INNER JOIN Review 
+                ON RECIPE_WITHOUT_MILK_ALLERGY.RECIPE_ID_WITHOUT_MILK_ALLERGY=Review.RecipeID
+                GROUP BY Review.RecipeID
+                ORDER BY AVG(Review.Rating) DESC, Review.RecipeID ASC
+                LIMIT 10) AS T 
+                WHERE T.id = Recipe.RecipeID;";
+            $result = $conn->query($sql);
+            $res = array();
+            while($row = $result->fetch_assoc()){
+                array_push($res, $row);
+            }
+            return $res;
+        }
+
         public function insertRecipe($recipe){
             $recipeName = $recipe["RecipeName"];
             $imageUrl = $recipe["ImageUrl"];
