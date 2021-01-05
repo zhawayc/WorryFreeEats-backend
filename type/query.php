@@ -82,6 +82,12 @@ $queryType = new ObjectType([
             "resolve"=>function($root,$args){
                 return UserDao::getInstance()->getUserByUserId($args["id"]);
             }
+        ],
+        "allergies"=>[
+            "type"=>Type::listOf(Type::string()),
+            "resolve"=>function($root,$args){
+                return AllergyTypeDao::getInstance()->getAllergies();
+            }
         ]
     ]
 ]);

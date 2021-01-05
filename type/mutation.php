@@ -68,7 +68,7 @@ $mutationType = new ObjectType([
         "deleteReview"=>[
             "type"=>Type::int(),
             "args"=>[
-                "id"=>Type::int()
+                "id"=>Type::id()
             ],
             "resolve"=>function($parentValue,$args){
                 return ReviewDao::getInstance()->deleteReview($args["id"]);
