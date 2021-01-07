@@ -27,4 +27,33 @@
             $result = $conn->query($sql);
             return $result->fetch_assoc();
         }
+
+        public function userLogin($args){
+            $userName = $args["UserName"];
+            $userPass = $args["UserPass"];
+            $conn = $this->connectionManager->getConnection();
+            $sql = "SELECT * FROM User WHERE UserName = '$userName' AND UserPass = '$userPass'";
+            $result = $conn->query($sql);
+            return $result->fetch_assoc();
+        }
+
+        public function getUserByUserName($name){
+            $conn = $this->connectionManager->getConnection();
+            $sql = "SELECT * FROM User WHERE UserName = '$name';";
+            $result = $conn->query($sql);
+            return $result->fetch_assoc();
+        }
+
+        public function insertUser($user){
+            $userName = $user["UserName"];
+            $userPass = $user["UserPass"];
+            $firstName = $user["FirstName"];
+            $email = $user["Email"];
+            $conn = $this->connectionManager->getConnection();
+            $sql = "INSERT INTO User(UserName, UserPass, FirstName, Email) 
+            VALUES ('$userName','$userPass','$firstName','$email');";
+            $conn->query($sql);
+            $user["UserId"] = mysqli_insert_id($conn);
+            return $user;
+        }
     }

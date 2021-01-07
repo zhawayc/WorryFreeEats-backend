@@ -34,10 +34,10 @@ $mutationType = new ObjectType([
         "deleteRecipe"=>[
             "type"=>Type::int(),
             "args"=>[
-                "RecipeID"=>Type::id()
+                "id"=>Type::id()
             ],
             "resolve"=>function($parentValue,$args){
-                return RecipeDao::getInstance()->deleteRecipe($args["RecipeID"]);
+                return RecipeDao::getInstance()->deleteRecipe($args["id"]);
             }
         ],
         "addReview"=>[
@@ -72,6 +72,37 @@ $mutationType = new ObjectType([
             ],
             "resolve"=>function($parentValue,$args){
                 return ReviewDao::getInstance()->deleteReview($args["id"]);
+            }
+        ],
+        "userLogin"=>[
+            "type"=>$userType,
+            "args"=>[
+                "UserName"=>Type::string(),
+                "UserPass"=>Type::string()
+            ],
+            "resolve"=>function($root,$args){
+                $user=UserDao::getInstance()->userLogin($args);
+                if($user!=null){
+                    setcookie("user", $user["UserId"], time()+3600);
+                }
+                return $user;
+            }
+        ],
+        "userRegister"=>[
+            "type"=>$userType,
+            "args"=>[
+                "UserName"=>Type::nonNull(Type::string()),
+                "UserPass"=>Type::nonNull(Type::string()),
+                "FirstName"=>Type::string(),
+                "Email"=>Type::string()
+            ],
+            "resolve"=>function($root,$args){
+                if(UserDao::getInstance()->getUserByUserName($args["UserName"])){
+                    return null;
+                }
+                $user = UserDao::getInstance()->insertUser($args);
+                setcookie("user", $user["UserId"]);
+                return $user;
             }
         ]
     ]

@@ -31,8 +31,9 @@ try{
 header('Content-Type: application/json');
 //if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
   //  if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']) && $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'] == 'POST') {
-        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Origin: http://localhost:3000');
         header('Access-Control-Allow-Headers: X-Requested-With, content-type, access-control-allow-origin, access-control-allow-methods, access-control-allow-headers');
-  //  }
+        header('Access-Control-Allow-Credentials: true');
+        //  }
 //}
 echo json_encode($output);
